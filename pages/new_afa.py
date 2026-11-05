@@ -37,13 +37,15 @@ def render():
                     os.makedirs(upload_dir, exist_ok=True)
                     for f in uploaded_files:
                         file_path = os.path.join(upload_dir, f.name)
+                        bytes_data = f.read()
                         with open(file_path, "wb") as out_file:
-                            out_file.write(f.getbuffer())
+                            out_file.write(bytes_data)
                         evidence_count += 1
                         
+                        # Lectura segura de texto si es un archivo .txt, .md o .log
                         if f.name.endswith(".txt") or f.name.endswith(".md") or f.name.endswith(".log"):
                             try:
-                                content = f.getvalue().decode("utf-8", errors="ignore")
+                                content = bytes_data.decode("utf-8", errors="ignore")
                                 attachments_text += f"\n--- Archivo Adjunto: {f.name} ---\n{content[:2000]}\n"
                             except Exception:
                                 pass
