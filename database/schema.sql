@@ -103,3 +103,6 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 
 INSERT OR IGNORE INTO users (id, username, password_hash, full_name, role) 
 VALUES (1, 'admin', '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'Administrador General', 'Administrador');
+```[cite: 83]
+
+Con esta modificación aplicada en su servidor, el motor procesará los análisis de falla (AFA) y causa raíz (ACR) junto con la información adjunta de manera fluida.
