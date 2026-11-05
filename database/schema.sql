@@ -26,10 +26,19 @@ CREATE TABLE IF NOT EXISTS events (
 CREATE TABLE IF NOT EXISTS acr (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event_id INTEGER REFERENCES events(id) ON DELETE CASCADE,
+    participants TEXT,
+    leader TEXT,
+    team_area TEXT,
     problem_definition TEXT,
     technical_description TEXT,
     what_happened TEXT,
     how_happened TEXT,
+    who_detected TEXT,
+    how_much_loss TEXT,
+    which_materials TEXT,
+    where_located TEXT,
+    when_started TEXT,
+    immediate_action TEXT,
     why_1 TEXT,
     why_2 TEXT,
     why_3 TEXT,
@@ -44,6 +53,19 @@ CREATE TABLE IF NOT EXISTS acr (
 CREATE TABLE IF NOT EXISTS afa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event_id INTEGER REFERENCES events(id) ON DELETE CASCADE,
+    participants TEXT,
+    leader TEXT,
+    team_area TEXT,
+    problem_definition TEXT,
+    technical_description TEXT,
+    what_happened TEXT,
+    how_happened TEXT,
+    who_detected TEXT,
+    how_much_loss TEXT,
+    which_materials TEXT,
+    where_located TEXT,
+    when_started TEXT,
+    immediate_action TEXT,
     failure_mode TEXT,
     effect TEXT,
     consequence TEXT,
@@ -52,6 +74,8 @@ CREATE TABLE IF NOT EXISTS afa (
     why_3 TEXT,
     why_4 TEXT,
     why_5 TEXT,
+    physical_cause TEXT,
+    contributor_cause TEXT,
     root_cause TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -79,4 +103,3 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 
 INSERT OR IGNORE INTO users (id, username, password_hash, full_name, role) 
 VALUES (1, 'admin', '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'Administrador General', 'Administrador');
-
