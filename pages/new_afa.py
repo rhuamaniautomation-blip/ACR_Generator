@@ -1,11 +1,12 @@
 import streamlit as st
+import pandas as pd
 from datetime import date
 from db.sqlite_manager import SQLiteManager
 from core.ai_engine import AIEngine
 from core.afa_generator import AFAGenerator
 
 def render():
-    st.subheader("⚙️ Nuevo Análisis de Falla (AFA / FMEA)")
+    st.subheader("⚙️ Nuevo Análisis de Falla (AFA / FMEA - Estándar MAN-F-054)")
     
     with st.form("afa_form"):
         title = st.text_input("Título del Análisis de Falla")
@@ -14,7 +15,7 @@ def render():
         linea = st.text_input("Línea / Sistema")
         equipment = st.text_input("Equipo / Componente")
         criticality = st.selectbox("Criticidad", ["Alta", "Media", "Baja"])
-        description = st.text_area("Descripción del Modo de Falla")
+        description = st.text_area("Descripción del Modo de Falla y Síntomas")
         
         submitted = st.form_submit_button("Generar AFA con IA")
 
@@ -25,11 +26,32 @@ def render():
                 db = SQLiteManager()
                 ai = AIEngine(provider="Gemini Flash")
                 afa_gen = AFAGenerator(db, ai)
-                with st.spinner("Ejecutando AFA..."):
+                with st.spinner("Ejecutando AFA y análisis de 5 Porqués..."):
                     event_id = afa_gen.process_afa(
                         title=title, event_date=str(event_date), area=area,
                         linea=linea, equipment=equipment, criticality=criticality,
                         description=description, username=st.session_state.get("username", "admin")
                     )
                 st.success(f"¡AFA generado con éxito! ID de Evento: #{event_id}")
-
+                
+                # Mostrar resultado en pantalla inmediatamente
+                st.markdown("---")
+                st.markdown("### 📋 Resultado del Análisis AFA Generado (Formato MAN-F-054)")
+                afa_data = db.execute_query("SELECT * FROM afa WHERE event_id = ?", (event_id,))
+                actions_data = db.execute_query("SELECT * FROM actions WHERE event_id = ?", (event_id,))
+                if afa_data:
+                    afa = dict(afa_data[0])
+                    st.info(f"**Modo de Falla:** {afa.get('failure_mode', '')}")
+                    st.write(f"**Efecto:** {afa.get('effect', '')}")
+                    st.write(f"**Consecuencia:** {afa.get('consequence', '')}")
+                    
+                    st.markdown("#### Análisis de los 5 Porqués")
+                    st.write(f"1. {afa.get('why_1', '')}")
+                    st.write(f"2. {afa.get('why_2', '')}")
+                    st.write(f"3. {afa.get('why_3', '')}")
+                    st.write(f"4. {afa.get('why_4', '')}")
+                    st.write(f"5. **Causa Raíz:** {afa.get('why_5', '')}")
+                    
+                    st.markdown("#### Plan de Acción AFA")
+                    st.dataframe(pd.DataFrame([dict(a) for a in actions_data]), use_container_width=True)
+                st.balloons()
