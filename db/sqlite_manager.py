@@ -27,15 +27,28 @@ class SQLiteManager:
 
     def init_db(self) -> None:
         try:
+            # Si el esquema existe, procedemos a asegurar la integridad
             if os.path.exists(SCHEMA_PATH):
                 with open(SCHEMA_PATH, "r", encoding="utf-8") as sf:
                     schema_script = sf.read()
                 
-                conn = self.get_connection()
-                # Ejecutamos el script de esquema de forma segura
-                conn.executescript(schema_script)
-                conn.commit()
-                conn.close()
+                try:
+                    conn = self.get_connection()
+                    conn.executescript(schema_script)
+                    conn.commit()
+                    conn.close()
+                except Exception as db_err:
+                    # Si ocurre un error operacional por conflicto de esquema previo, borramos la BD y reintentamos limpio
+                    logger.warning(f"Conflicto detectado en la base de datos ({db_err}). Recreando base de datos limpia...")
+                    if os.path.exists(self.db_path):
+                        conn.close()
+                        os.remove(self.db_path)
+                    
+                    conn = self.get_connection()
+                    conn.executescript(schema_script)
+                    conn.commit()
+                    conn.close()
+                
                 logger.info("Base de datos inicializada correctamente.")
             else:
                 logger.error(f"No se encontró el archivo de esquema en: {SCHEMA_PATH}")
