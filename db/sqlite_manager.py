@@ -27,38 +27,20 @@ class SQLiteManager:
 
     def init_db(self) -> None:
         try:
-            recreate = False
-            # Verificamos si el archivo de base de datos ya existe para chequear su estructura
-            if os.path.exists(self.db_path):
-                conn = self.get_connection()
-                cursor = conn.cursor()
-                try:
-                    cursor.execute("PRAGMA table_info(acr);")
-                    columns = [col[1] for col in cursor.fetchall()]
-                    # Si la tabla existe pero le falta la columna 'leader', forzamos recreación
-                    if not columns or "leader" not in columns:
-                        recreate = True
-                except Exception:
-                    recreate = True
-                finally:
-                
-                    conn.close()
-
-            if recreate and os.path.exists(self.db_path):
-                os.remove(self.db_path)
-                logger.warning("Base de datos obsoleta eliminada. Se recreará con el nuevo esquema.")
-
-            # Ejecutar el esquema oficial
             if os.path.exists(SCHEMA_PATH):
                 with open(SCHEMA_PATH, "r", encoding="utf-8") as sf:
                     schema_script = sf.read()
+                
                 conn = self.get_connection()
+                # Ejecutamos el script de esquema de forma segura
                 conn.executescript(schema_script)
                 conn.commit()
                 conn.close()
                 logger.info("Base de datos inicializada correctamente.")
+            else:
+                logger.error(f"No se encontró el archivo de esquema en: {SCHEMA_PATH}")
         except Exception as e:
-            logger.error(f"Error al inicializar la base de datos: {e}")
+            logger.error(f"Error crítico al inicializar la base de datos: {e}")
             raise
 
     def execute_query(self, query: str, params: tuple = ()) -> List[sqlite3.Row]:
