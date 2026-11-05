@@ -5,8 +5,9 @@ class PromptBuilder:
     def build_acr_prompt(title: str, area: str, equipment: str, description: str, leader: str = "", participants: str = "", attachments_text: str = "") -> str:
         attachment_section = f"\nEVIDENCIAS Y DOCUMENTOS ADJUNTOS ANALIZADOS:\n{attachments_text}\n" if attachments_text else ""
         return f"""
-Actúa como un equipo multidisciplinario senior de Ingeniería de Confiabilidad y Mantenimiento Industrial compuesto por: Especialista RCA/ACR Senior, Ingeniero Mecánico, Ingeniero Eléctrico, Ingeniero de Automatización y Reliability Engineer.
-Analiza el siguiente evento industrial y genera un Análisis de Causa Raíz (ACR) completo, técnico y profundo según el Estándar Oficial MAN-F-054.
+Actúa como un equipo multidisciplinario senior de Ingeniería de Confiabilidad y Mantenimiento Industrial (Especialista RCA/ACR Senior, Reliability Engineer y Gerente de Confiabilidad).
+A partir de la descripción bruta proporcionada por el usuario, DEBES ANALIZAR, TRANSFORMAR y REDACTAR de forma profesional, estructurada, formal y con rigor técnico de ingeniería cada uno de los campos del formato oficial MAN-F-054. 
+PROHIBIDO copiar textualmente los errores ortográficos o de redacción del usuario; debes sintetizar y redactar con vocabulario corporativo e institucional de nivel gerencial.
 
 INFORMACIÓN GENERAL DEL EVENTO:
 - Título del Evento: {title}
@@ -14,74 +15,75 @@ INFORMACIÓN GENERAL DEL EVENTO:
 - Equipo / Tag: {equipment}
 - Líder del Análisis: {leader or 'Ingeniero de Confiabilidad'}
 - Participantes: {participants or 'Equipo de Mantenimiento y Operaciones'}
-- Descripción Inicial del Problema: {description}
+- Descripción Bruta del Evento / Problema: {description}
 {attachment_section}
 
-REGLAS OBLIGATORIAS DE INGENIERÍA PARA COMPLETA EL ESTÁNDAR MAN-F-054:
-1. DESGLOSE 5W + 2H OBLIGATORIO:
-   - ¿Qué?: Qué se observó, qué tarea falló y qué debió haber pasado nominalmente.
-   - ¿Cómo?: Mecanismo físico de la falla, cómo ocurría el problema y cómo se ejecutó el trabajo.
-   - ¿Quién?: Quién originó, quién detectó y a quién no le afectó.
-   - ¿Cuánto?: Frecuencia del evento, extensión del daño y estimación de pérdidas (horas de parada, OEE o costo).
-   - ¿Cuál?: Marcas, modelos, formatos, componentes y materiales intermedios/finales involucrados.
-   - ¿Dónde?: Punto técnico exacto donde nace la falla.
-   - ¿Cuándo?: Fecha/hora de inicio y patrón de ocurrencia.
+REGLAS OBLIGATORIAS DE INGENIERÍA PARA EL ESTÁNDAR MAN-F-054:
+1. DESGLOSE 5W + 2H PROFESIONAL Y TÉCNICO:
+   - Problema Enfocado: Síntesis ejecutiva y formal del problema detectado para la gerencia.
+   - ¿Qué?: Qué sucedió exactamente, tarea que falló, secuencia lógica y condición nominal esperada.
+   - ¿Cómo?: Mecanismo técnico detallado de cómo se originó y propagó la falla o error de secuencia.
+   - ¿Quién?: Quién detectó el evento, quién operaba y a quién no le afectó.
+   - ¿Cuánto?: Cuantificación del impacto, tiempo de parada, riesgo de seguridad o pérdida de OEE.
+   - ¿Cuál?: Componentes, números de lote (ej. Pyro G, BF), marcas, formatos o materiales implicados.
+   - ¿Dónde?: Estación o ubicación técnica exacta donde nace o se manifiesta el problema (ej. Estación ST22 / ST23).
+   - ¿Cuándo?: Fecha, hora exacta y modo de operación (ej. Automático, vaciado EMPTYN, producción normal).
+   - Acción Inmediata: Contención operativa ejecutada (parada de emergencia, evacuación, revisión de herramental).
 
 2. ÁRBOL DE LOS 5 PORQUÉS RIGUROSO (MÍNIMO Y OBLIGATORIO 5 NIVELES):
-   - Cada Porqué debe ser un análisis técnico avanzado de ingeniería. Prohibido usar respuestas simples de una frase o superficiales.
-   - Prohibido atribuir la causa raíz a "error humano", "falta de atención" o "falta de capacitación". Debes profundizar hasta llegar a la falla sistémica de gestión de activos, deficiencia en estándares RCM, errores de diseño o procedimientos defectuosos.
-   - Nivel 1: Causa física inmediata.
-   - Nivel 2: Mecanismo técnico o condición operacional facilitadora.
-   - Nivel 3: Deficiencia en el estándar operativo, inspección o mantenimiento.
-   - Nivel 4: Brecha en el sistema de gestión, control de calidad o proveedores.
-   - Nivel 5: Causa Raíz Sistémica Organizacional / Estrategia de Confiabilidad.
+   - Cada Porqué debe ser un análisis técnico avanzado de ingeniería. Prohibido usar respuestas simples o superficiales.
+   - Prohibido atribuir la causa raíz a "error humano" simple; profundizar en deficiencias de lógica de control, automatización, sincronización de estaciones o gestión de activos.
+   - Nivel 1: Causa física o secuencia inmediata del fallo.
+   - Nivel 2: Condición técnica o operacional facilitadora en el sistema.
+   - Nivel 3: Deficiencia en la pauta de control, sensor o validación de secuencia.
+   - Nivel 4: Brecha en el diseño de automatización o validación de interlocks.
+   - Nivel 5: Causa Raíz Sistémica Organizacional / Ingeniería de Confiabilidad y Automatización.
 
 3. ACCIONES Y PLANES DE SEGUIMIENTO (CORRECTIVAS, PREVENTIVAS Y CAUSA RAÍZ):
-   - Definir acción inmediata de contención.
-   - Definir acciones específicas asignando objetivo, responsable por cargo, prioridad (Alta/Media/Baja), fecha tentativa y tipo.
+   - Definir acciones específicas asignando objetivo gerencial, responsable por cargo corporativo, prioridad, fecha tentativa y tipo.
 
 RESPONDE EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON LA SIGUIENTE ESTRUCTURA EXACTA:
 {{
     "participantes": "Líder y lista de participantes técnicos",
-    "problema_enfocado": "Descripción enfocada del problema bajo estándar MAN-F-054",
-    "que_paso": "Análisis del QUÉ: Qué se vio, tarea que falló y qué debió pasar",
-    "como_ocurrio": "Análisis del CÓMO: Mecanismo de ocurrencia y ejecución del trabajo",
-    "quien_detecto": "Análisis del QUIÉN: Quién detectó, quién originó y a quién no le pasó",
-    "cuanto_perdida": "Análisis del CUÁNTO: Frecuencia de ocurrencia, horas de parada e impacto económico",
-    "cual_material": "Análisis del CUÁL: Componentes, marcas, formatos y materiales afectados",
-    "donde_nacimiento": "Análisis del DÓNDE: Punto exacto donde nace el problema",
-    "cuando_inicio": "Análisis del CUÁNDO: Momento exacto de inicio y condición temporal",
-    "accion_inmediata": "Acción inmediata de contención o corrección ejecutada",
-    "porque1": "Por qué 1: Causa directa física o manifestación visible inmediata",
-    "porque2": "Por qué 2: Mecanismo técnico y condición física/operativa subyacente",
-    "porque3": "Por qué 3: Deficiencia en el estándar de mantenimiento, ajuste o inspección",
-    "porque4": "Por qué 4: Ausencia de control de calidad o brecha en la política de activos",
-    "porque5": "Por qué 5 (Causa Raíz Sistémica): Deficiencia organizacional, de diseño o de estrategia RCM",
-    "causa_fisica": "Descripción detallada de la causa física directa de la falla",
-    "causa_contribuyente": "Factores de entorno, operacionales o de contexto contribuyente",
-    "causa_raiz": "Causa raíz sistémica fundamental identificada",
+    "problema_enfocado": "Redacción ejecutiva formal del problema enfocado bajo estándar MAN-F-054",
+    "que_paso": "Descripción técnica del qué sucedió y secuencia de eventos",
+    "como_ocurrio": "Descripción analítica del cómo ocurrió la propagación del fallo",
+    "quien_detecto": "Detalle formal de quién detectó y contexto operativo",
+    "cuanto_perdida": "Evaluación del impacto, tiempo de parada y criticidad del riesgo",
+    "cual_material": "Identificación técnica de componentes, lotes y materiales involucrados",
+    "where_located": "Estación o ubicación técnica precisa del evento",
+    "when_started": "Momento temporal y modo de operación del sistema",
+    "accion_inmediata": "Acción inmediata de contención y seguridad ejecutada",
+    "porque1": "Por qué 1: Análisis técnico de la manifestación física inicial",
+    "porque2": "Por qué 2: Análisis de la condición o anomalía en el flujo/secuencia",
+    "porque3": "Por qué 3: Deficiencia en la validación de interlocks o sensores",
+    "porque4": "Por qué 4: Brecha en la lógica de control o estándar operativo",
+    "porque5": "Por qué 5 (Causa Raíz Sistémica): Deficiencia estructural en la ingeniería del proceso o sistema de gestión",
+    "causa_fisica": "Descripción formal de la causa física directa del evento",
+    "causa_contribuyente": "Factores operacionales y de entorno contribuyentes",
+    "causa_raiz": "Causa raíz sistémica fundamental validada",
     "acciones": [
         {{
-            "accion": "Acción de contención inmediata o corrección",
-            "objetivo": "Restaurar operación nominal o contener el evento",
-            "responsable": "Mantenimiento Mecánico / Operaciones",
+            "accion": "Acción inmediata de verificación y contención técnica",
+            "objetivo": "Mitigar riesgo operativo inmediato",
+            "responsable": "Supervisión de Operaciones",
             "prioridad": "Alta",
             "fecha": "2026-12-31",
             "estado": "Pendiente",
             "tipo": "Inmediata"
         }},
         {{
-            "accion": "Acción correctiva técnica sobre el activo",
-            "objetivo": "Restaurar condición original de los componentes",
-            "responsable": "Mantenimiento",
+            "accion": "Acción correctiva sobre sensores o lógica de secuencia",
+            "objetivo": "Restaurar fiabilidad operativa",
+            "responsable": "Mantenimiento / Automatización",
             "prioridad": "Alta",
             "fecha": "2026-12-31",
             "estado": "Pendiente",
             "tipo": "Correctiva"
         }},
         {{
-            "accion": "Acción preventiva basada en RCM (LUP o Pauta de Inspección)",
-            "objetivo": "Estandarizar inspecciones y prevenir recurrencia",
+            "accion": "Acción preventiva basada en RCM (Actualización de pautas y validación de interlocks)",
+            "objetivo": "Prevenir recurrencia de fallas de secuencia",
             "responsable": "Ingeniería de Confiabilidad",
             "prioridad": "Alta",
             "fecha": "2027-01-15",
@@ -89,9 +91,9 @@ RESPONDE EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON LA SIGUIENTE ESTRUCTURA EXAC
             "tipo": "Preventiva"
         }},
         {{
-            "accion": "Acción sobre la Causa Raíz (Rediseño, Calibración o Modificación del Sistema)",
-            "objetivo": "Eliminar sistémicamente el modo de falla",
-            "responsable": "Jefatura de Mantenimiento / Ingeniería",
+            "accion": "Acción sobre la Causa Raíz (Rediseño o mejora del sistema de control y verificación de herramental)",
+            "objetivo": "Eliminar sistémicamente la vulnerabilidad",
+            "responsable": "Gerencia de Ingeniería / Operaciones",
             "prioridad": "Alta",
             "fecha": "2027-01-30",
             "estado": "Pendiente",
@@ -106,7 +108,7 @@ RESPONDE EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON LA SIGUIENTE ESTRUCTURA EXAC
         attachment_section = f"\nEVIDENCIAS Y DOCUMENTOS ADJUNTOS ANALIZADOS:\n{attachments_text}\n" if attachments_text else ""
         return f"""
 Actúa como un Especialista Senior en FMEA/AFA y Reliability Engineer.
-Analiza la siguiente falla industrial y genera un Análisis de Falla (AFA / FMEA) completo y riguroso de nivel de ingeniería bajo el estándar MAN-F-054.
+A partir de la descripción bruta proporcionada, DEBES ANALIZAR, TRANSFORMAR y REDACTAR formalmente un Análisis de Falla (AFA / FMEA) estructurado y riguroso bajo el estándar MAN-F-054, con vocabulario técnico institucional para la gerencia.
 
 INFORMACIÓN GENERAL DE LA FALLA:
 - Título del AFA: {title}
@@ -114,52 +116,51 @@ INFORMACIÓN GENERAL DE LA FALLA:
 - Equipo / Componente / Tag: {equipment}
 - Líder del AFA: {leader or 'Especialista en Confiabilidad'}
 - Participantes: {participants or 'Equipo Multidisciplinario de Mantenimiento'}
-- Descripción del Modo de Falla y Síntomas: {description}
+- Descripción Bruta del Modo de Falla y Síntomas: {description}
 {attachment_section}
 
-REGLAS OBLIGATORIAS DE INGENIERÍA PARA COMPLETAR EL ESTÁNDAR MAN-F-054 Y EL AFA:
-1. DESGLOSE COMPLETO 5W + 2H DEL MODO DE FALLA:
-   - ¿Qué?: Qué se observó, modo de falla técnica y qué debió haber pasado.
-   - ¿Cómo?: Mecanismo de degradación/falla y cómo se operaba/ejecutaba el trabajo.
-   - ¿Quién?: Quién detectó el fallo y quién originó la condición.
-   - ¿Cuánto?: Frecuencia, horas de indisponibilidad y consecuencia económica/OEE.
-   - ¿Cuál?: Componente específico, repuesto, marcas, modelos y materiales afectados.
-   - ¿Dónde?: Ubicación técnica exacta y punto de origen.
-   - ¿Cuándo?: Cuándo inició el síntoma y patrón de falla.
+REGLAS OBLIGATORIAS DE INGENIERÍA PARA EL AFA (MAN-F-054):
+1. DESGLOSE 5W + 2H FORMAL Y TÉCNICO:
+   - Problema Enfocado / Modo de Falla: Descripción técnica formal del modo de falla principal.
+   - ¿Qué?: Síntoma técnico y desviación respecto a la condición nominal.
+   - ¿Cómo?: Mecanismo de propagación de la falla en el sistema.
+   - ¿Quién?: Quién detectó el fallo y contexto de operación.
+   - ¿Cuánto?: Impacto en disponibilidad, OEE y seguridad.
+   - ¿Cuál?: Componentes, partes y materiales involucrados.
+   - ¿Dónde?: Ubicación exacta del componente fallido.
+   - ¿Cuándo?: Patrón temporal y condiciones de carga.
+   - Acción Inmediata: Medida correctiva de contención inicial.
 
-2. ÁRBOL DE LOS 5 PORQUÉS COMPLETO (COMPLETAR OBLIGATORIAMENTE LOS 5 NIVELES):
-   - Cada Porqué debe ser un análisis técnico detallado y profundo. Prohibido omitir niveles o colocar frases genéricas.
-   - Profundizar hasta encontrar la causa raíz sistémica, fallas en la estrategia de mantenimiento predictivo/preventivo o problemas de diseño del activo.
-
+2. ÁRBOL DE LOS 5 PORQUÉS COMPLETO Y PROFUNDO (5 NIVELES OBLIGATORIOS).
 3. DETERMINACIÓN DE MODO DE FALLA, EFECTO, CONSECUENCIA Y PLANES DE ACCIÓN.
 
 RESPONDE EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON LA SIGUIENTE ESTRUCTURA EXACTA:
 {{
     "participantes": "Líder y participantes del AFA",
-    "problema_enfocado": "Descripción técnica del problema/modo de falla enfocado",
-    "que_paso": "Análisis del QUÉ: Síntoma técnico, falla observada y condición deseada",
-    "como_ocurrio": "Análisis del CÓMO: Mecanismo de propagación y operación del componente",
-    "quien_detecto": "Análisis del QUIÉN: Quién detectó el modo de falla",
-    "cuanto_perdida": "Análisis del CUÁNTO: Extensión del daño, tiempo de reparación e impacto OEE",
-    "cual_material": "Análisis del CUÁL: Componentes específicos, piezas y materiales afectados",
-    "donde_nacimiento": "Análisis del DÓNDE: Punto de origen físico de la falla",
-    "cuando_inicio": "Análisis del CUÁNDO: Inicio de la degradación y condición temporal",
+    "problema_enfocado": "Descripción formal del modo de falla enfocado bajo estándar MAN-F-054",
+    "que_paso": "Análisis formal del qué sucedió y desviación técnica",
+    "como_ocurrio": "Análisis del cómo se propagó el modo de falla",
+    "quien_detecto": "Contexto de detección del fallo",
+    "cuanto_perdida": "Impacto y consecuencia en la producción",
+    "cual_material": "Componentes y partes críticas afectadas",
+    "where_located": "Ubicación técnica precisa del componente",
+    "when_started": "Momento de inicio de la degradación",
     "accion_inmediata": "Acción inmediata de contención ejecutada",
     "modo_falla": "Descripción técnica formal del Modo de Falla",
-    "efecto": "Efecto local y en el sistema de producción",
-    "consecuencia": "Consecuencia en seguridad, medio ambiente y costos",
-    "porque1": "Por qué 1: Causa directa o manifestación física visible del modo de falla",
-    "porque2": "Por qué 2: Mecanismo de degradación técnico o esfuerzo mecánico/eléctrico anómalo",
-    "porque3": "Por qué 3: Condición latente o deficiencia en la pauta de inspección/mantenimiento",
-    "porque4": "Por qué 4: Brecha en el plan preventivo/predictivo RCM o proveedores de piezas",
-    "porque5": "Por qué 5 (Causa Raíz Sistémica): Deficiencia en la gestión de activos, diseño o ingeniería de planta",
-    "causa_fisica": "Descripción del modo físico de falla de los materiales",
-    "causa_contribuyente": "Factores de contexto y parámetros operacionales",
+    "effect": "Efecto local y sistémico en la producción",
+    "consequence": "Consecuencia en seguridad y costos",
+    "porque1": "Por qué 1: Causa física directa del modo de falla",
+    "porque2": "Por qué 2: Mecanismo de esfuerzo o condición anómala",
+    "porque3": "Por qué 3: Condición latente en el sistema",
+    "porque4": "Por qué 4: Brecha en la estrategia predictiva/preventiva",
+    "porque5": "Por qué 5 (Causa Raíz Sistémica): Deficiencia estructural en la gestión de activos o diseño",
+    "causa_fisica": "Descripción formal de la causa física de la falla",
+    "causa_contribuyente": "Factores operacionales contribuyentes",
     "causa_raiz": "Causa raíz fundamental identificada",
-    "acciones": [
+    "actions": [
         {{
-            "accion": "Acción inmediata de contención del impacto",
-            "objetivo": "Mitigar el riesgo operativo inmediato",
+            "accion": "Acción inmediata de contención del riesgo",
+            "objetivo": "Mitigar impacto operativo",
             "responsable": "Operaciones / Mantenimiento",
             "prioridad": "Alta",
             "fecha": "2026-12-31",
@@ -167,17 +168,17 @@ RESPONDE EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON LA SIGUIENTE ESTRUCTURA EXAC
             "tipo": "Inmediata"
         }},
         {{
-            "accion": "Acción correctiva sobre componentes dañados",
-            "objetivo": "Restaurar integridad técnica del activo",
-            "responsable": "Mantenimiento Mecánico/Eléctrico",
+            "accion": "Acción correctiva sobre el componente",
+            "objetivo": "Restaurar integridad técnica",
+            "responsable": "Mantenimiento Mecánico",
             "prioridad": "Alta",
             "fecha": "2026-12-31",
             "estado": "Pendiente",
             "tipo": "Correctiva"
         }},
         {{
-            "accion": "Acción preventiva (LUP / Actualización de Plan RCM)",
-            "objetivo": "Prevenir la recurrencia del modo de falla",
+            "accion": "Acción preventiva (Actualización RCM / Pauta de Inspección)",
+            "objetivo": "Prevenir recurrencia del modo de falla",
             "responsable": "Ingeniería de Confiabilidad",
             "prioridad": "Alta",
             "fecha": "2027-01-15",
@@ -185,8 +186,8 @@ RESPONDE EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON LA SIGUIENTE ESTRUCTURA EXAC
             "tipo": "Preventiva"
         }},
         {{
-            "accion": "Acción sobre la Causa Raíz (Rediseño, Calibración o Modificación del Sistema)",
-            "objetivo": "Eliminar sistémicamente la causa raíz",
+            "accion": "Acción sobre la Causa Raíz (Modificación o rediseño sistémico)",
+            "objetivo": "Eliminar la causa raíz definitivamente",
             "responsable": "Jefatura de Mantenimiento",
             "prioridad": "Alta",
             "fecha": "2027-01-30",
