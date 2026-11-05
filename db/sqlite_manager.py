@@ -6,8 +6,9 @@ from typing import List, Dict, Any, Optional
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "database", "database.db")
-SCHEMA_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "database", "schema.sql")
+BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+DB_PATH = os.path.join(BASE_DIR, "database", "database.db")
+SCHEMA_PATH = os.path.join(BASE_DIR, "database", "schema.sql")
 
 class SQLiteManager:
     """Gestor robusto de base de datos SQLite para la plataforma ACR & AFA."""
@@ -27,6 +28,10 @@ class SQLiteManager:
 
     def init_db(self) -> None:
         try:
+            db_dir = os.path.dirname(self.db_path)
+            if db_dir and not os.path.exists(db_dir):
+                os.makedirs(db_dir, exist_ok=True)
+
             if os.path.exists(SCHEMA_PATH):
                 with open(SCHEMA_PATH, "r", encoding="utf-8") as sf:
                     schema_script = sf.read()
@@ -39,21 +44,17 @@ class SQLiteManager:
                     conn.close()
                 except Exception as db_err:
                     logger.warning(f"Conflicto detectado en la base de datos ({db_err}). Recreando base de datos limpia...")
-                    
-                    # Asegurar cierre de conexión antes de eliminar el archivo
                     if conn:
                         try:
                             conn.close()
                         except Exception:
                             pass
-                    
                     if os.path.exists(self.db_path):
                         try:
                             os.remove(self.db_path)
                         except Exception as rm_err:
                             logger.error(f"No se pudo eliminar el archivo de base de datos: {rm_err}")
                     
-                    # Reintento con base de datos limpia
                     conn = self.get_connection()
                     conn.executescript(schema_script)
                     conn.commit()
