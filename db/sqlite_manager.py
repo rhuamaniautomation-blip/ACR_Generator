@@ -27,23 +27,33 @@ class SQLiteManager:
 
     def init_db(self) -> None:
         try:
-            # Si el esquema existe, procedemos a asegurar la integridad
             if os.path.exists(SCHEMA_PATH):
                 with open(SCHEMA_PATH, "r", encoding="utf-8") as sf:
                     schema_script = sf.read()
                 
+                conn = None
                 try:
                     conn = self.get_connection()
                     conn.executescript(schema_script)
                     conn.commit()
                     conn.close()
                 except Exception as db_err:
-                    # Si ocurre un error operacional por conflicto de esquema previo, borramos la BD y reintentamos limpio
                     logger.warning(f"Conflicto detectado en la base de datos ({db_err}). Recreando base de datos limpia...")
-                    if os.path.exists(self.db_path):
-                        conn.close()
-                        os.remove(self.db_path)
                     
+                    # Asegurar cierre de conexión antes de eliminar el archivo
+                    if conn:
+                        try:
+                            conn.close()
+                        except Exception:
+                            pass
+                    
+                    if os.path.exists(self.db_path):
+                        try:
+                            os.remove(self.db_path)
+                        except Exception as rm_err:
+                            logger.error(f"No se pudo eliminar el archivo de base de datos: {rm_err}")
+                    
+                    # Reintento con base de datos limpia
                     conn = self.get_connection()
                     conn.executescript(schema_script)
                     conn.commit()
