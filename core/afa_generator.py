@@ -9,14 +9,14 @@ class AFAGenerator:
         self.db = db_manager
         self.ai = ai_engine
 
-    def process_afa(self, title: str, event_date: str, area: str, linea: str, equipment: str, criticality: str, description: str, username: str) -> int:
+    def process_afa(self, title: str, event_date: str, area: str, linea: str, equipment: str, criticality: str, description: str, username: str, attachments_text: str = "") -> int:
         event_query = """
             INSERT INTO events (title, event_date, area, linea, equipment, criticality, description, status, created_by)
             VALUES (?, ?, ?, ?, ?, ?, ?, 'Abierto', ?)
         """
         event_id = self.db.execute_non_query(event_query, (title, event_date, area, linea, equipment, criticality, description, username))
 
-        prompt = PromptBuilder.build_afa_prompt(title, area, equipment, description)
+        prompt = PromptBuilder.build_afa_prompt(title, area, equipment, description, attachments_text)
         ai_data = self.ai.generate_response(prompt)
 
         afa_query = """
