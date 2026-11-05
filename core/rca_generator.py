@@ -10,15 +10,18 @@ class RCAGenerator:
         self.ai = ai_engine
 
     def process_acr(self, title: str, event_date: str, area: str, linea: str, equipment: str, criticality: str, description: str, leader: str, participants: str, username: str, attachments_text: str = "") -> int:
+        # Se guarda la descripción bruta proporcionada por el usuario para trazabilidad
         event_query = """
             INSERT INTO events (title, event_date, area, linea, equipment, criticality, description, status, created_by)
             VALUES (?, ?, ?, ?, ?, ?, ?, 'Abierto', ?)
         """
         event_id = self.db.execute_non_query(event_query, (title, event_date, area, linea, equipment, criticality, description, username))
 
+        # Se invoca al prompt maestro para que la IA realice el análisis técnico gerencial
         prompt = PromptBuilder.build_acr_prompt(title, area, equipment, description, leader, participants, attachments_text)
         ai_data = self.ai.generate_response(prompt)
 
+        # Se insertan los campos transformados y estructurados profesionalmente por la IA
         acr_query = """
             INSERT INTO acr (event_id, participants, leader, team_area, problem_definition, technical_description, what_happened, how_happened, who_detected, how_much_loss, which_materials, where_located, when_started, immediate_action, why_1, why_2, why_3, why_4, why_5, physical_cause, contributor_cause, root_cause)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -28,15 +31,15 @@ class RCAGenerator:
             ai_data.get("participantes", participants),
             leader,
             area,
-            ai_data.get("problema_enfocado", description),
-            description,
-            ai_data.get("que_paso", description),
+            ai_data.get("problema_enfocado", "Análisis de evento industrial bajo estándar MAN-F-054"),
+            description, # Descripción técnica original de respaldo
+            ai_data.get("que_paso", ""),
             ai_data.get("como_ocurrio", ""),
             ai_data.get("quien_detecto", ""),
             ai_data.get("cuanto_perdida", ""),
             ai_data.get("cual_material", ""),
-            ai_data.get("donde_nacimiento", ""),
-            ai_data.get("cuando_inicio", ""),
+            ai_data.get("where_located", area),
+            ai_data.get("when_started", event_date),
             ai_data.get("accion_inmediata", ""),
             ai_data.get("porque1", ""),
             ai_data.get("porque2", ""),
@@ -62,8 +65,8 @@ class RCAGenerator:
                 act.get("prioridad", "Alta"),
                 act.get("fecha", "2026-12-31"),
                 act.get("estado", "Pendiente"),
-                act.get("tipo", "Correctiva")
+                act.get("tipo", act.get("tipo", "Correctiva"))
             ))
 
-        self.db.log_audit(username, "CREAR_ACR", f"Se creó el ACR para el evento ID {event_id}: {title}")
+        self.db.log_audit(username, "CREAR_ACR", f"Se generó el ACR analítico para el evento ID {event_id}: {title}")
         return event_id
